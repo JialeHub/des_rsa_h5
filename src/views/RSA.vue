@@ -31,7 +31,7 @@
     <div class="bottom">
       <span class="msg">作者：罗嘉乐(数软1185)</span>
       <span class="msg">|</span>
-      <span class="msg">201811921416</span>
+      <span class="msg">20181192****</span>
       <span class="msg">|</span>
       <span class="msg">2020.10 - 2020.12</span>
       <span class="msg">|</span>
