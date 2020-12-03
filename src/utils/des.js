@@ -23,7 +23,7 @@ export const group = (ss, step) => {
 
 /**
  * @param str 字符串(4个16bit以内字符)
- * @param bit64 是否转为64位(往前补0)，否则为60位
+ * @param bit64 是否转为64位(往前补0)，否则为默认
  * @return {Object} 32+32=64bit
  * @description 字符串转二进制
  * */
@@ -43,14 +43,14 @@ export const toBin = (str, bit64 = true) => {
     if (store.getters.con) console.log('字符串转64位二进制：', str, '=>', res)
     return res
   } else {
-    if (store.getters.con) console.log('字符串转60位二进制：', str, '=>', result.join(""))
+    if (store.getters.con) console.log('字符串转二进制：', str, '=>', result.join(""))
     return result.join("");
   }
 }
 
 /**
  * @param str 字符串
- * @param bit64 是否转为64位(往前补0)，否则为60位
+ * @param bit64 是否转为64位(往前补0)，否则为默认
  * @return {Object} 32+32=64bit
  * @description 二进制转字符串
  * */
@@ -67,7 +67,7 @@ export const toStr = (str, bit64 = true) => {
   }
   if (store.getters.con) {
     if (bit64) console.log('64位二进制转字符串：', str, '=>', result.join(""));
-    else console.log('60位二进制转字符串：', str, '=>', result.join(""));
+    else console.log('二进制转字符串：', str, '=>', result.join(""));
   }
   return result.join("");
 }

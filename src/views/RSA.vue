@@ -17,9 +17,13 @@
             <el-input type="text" placeholder="请输入密钥" v-model="Key"/>
           </div>
           <div class="c">
-            <el-button @click="generateKey" type="primary" class="btn" size="mini">随机生成 <br>密钥对🔑</el-button>
-            <el-button @click="encryption" type="primary" class="btn">加密 👉</el-button>
-            <el-button @click="decode" type="primary" class="btn">解密 👉</el-button>
+            <el-button @click="generateKey" type="primary" class="btn" size="small" :loading="loading" :disabled="loading"> 随机生成密钥对🔑</el-button>
+            <el-button @click="encryption" type="primary" class="btn" :loading="loading2" :disabled="loading2">数字加密 👉</el-button>
+            <el-button @click="decode" type="primary" class="btn" :loading="loading3" :disabled="loading3">数字解密 👉</el-button>
+            <el-button @click="generateKey(1)" type="success" class="btn" size="small" :loading="loading" :disabled="loading">生成16位密钥对🔑</el-button>
+            <el-button @click="encryption(1)" type="success" class="btn" :loading="loading2" :disabled="loading2">字符串加密 👉</el-button>
+            <el-button @click="decode(1)" type="success" class="btn" :loading="loading3" :disabled="loading3">字符串解密 👉</el-button>
+            <hr>
           </div>
           <div class="r">
             <div class="rt1">🚩 结果：</div>
@@ -41,13 +45,16 @@
 </template>
 
 <script>
-  import {generate_pbk_pvk, encryption, decode} from "@/utils/rsa"
+  import {generate_pbk_pvk, encryption, decode, toBin16,group, toStr16} from "@/utils/rsa"
   import {isEmpty} from "@/utils/common";
 
   export default {
     name: "Rsa",
     data() {
       return {
+        loading: false,
+        loading2: false,
+        loading3: false,
         M: '2,99', //明文
         Key: '', //密钥
         C: '',
@@ -69,7 +76,8 @@
       }
     },
     methods: {
-      generateKey() {
+      generateKey(type) {
+        this.loading=true
         let t1 = new Date()
         let se = this.M.split(',')
         if (se.length >= 2) {
@@ -80,25 +88,56 @@
         let failFlag = true
         while (failFlag) {
           this.C = generate_pbk_pvk(this.start, this.end)
-          failFlag = isEmpty(JSON.parse(this.C)['allKey']['n']) || isEmpty(JSON.parse(this.C)['allKey']['e']) || isEmpty(JSON.parse(this.C)['allKey']['d']) || JSON.parse(this.C)['allKey']['e']===1
+          failFlag = (type===1?JSON.parse(this.C)['allKey']['n']<=Math.pow(2,16):isEmpty(JSON.parse(this.C)['allKey']['n'])) || isEmpty(JSON.parse(this.C)['allKey']['e']) || isEmpty(JSON.parse(this.C)['allKey']['d']) || JSON.parse(this.C)['allKey']['e']===1
         }
         let t2 = new Date()
         this.$message({message: '密钥已生成！用时' + (t2 - t1) + 'ms', type: 'success'});
         console.log('Time:', t2 - t1);
+        this.loading=false
       },
-      encryption() {
+      encryption(type) {
+        this.loading2=true
         let t1 = new Date()
-        this.C = encryption(this.M, JSON.parse(this.Key))
+        this.C = ''
+        let MArr = this.M.split('') //按单个字符加密
+        if (type===1){ //单个字符 -> 16位二进制 -> 十进制 -> 加密(10进制) -> 16位二进制
+          let maxBit = JSON.parse(this.Key)['n'].toString(2).length //n的二进制长度
+          MArr.forEach(item=>{
+            let temp = toBin16(item)
+            temp = parseInt(temp,2)
+            temp = Number(encryption(temp, JSON.parse(this.Key)))
+            temp = temp.toString(2).padStart(maxBit,'0')
+            this.C += temp
+          })
+        }else{
+          this.C = encryption(this.M, JSON.parse(this.Key))
+        }
+
         let t2 = new Date()
         this.$message({message: '加密成功！用时' + (t2 - t1) + 'ms', type: 'success'});
         console.log('Time:', t2 - t1);
+        this.loading2=false
       },
-      decode() {
+      decode(type) {
+        this.loading3=true
         let t1 = new Date()
-        this.C = decode(this.M, JSON.parse(this.Key))
+        this.C = ''
+        if (type===1){ //16位二进制 -> 十进制 -> 解密(10进制) -> 16位二进制 -> 单个字符
+          let maxBit = JSON.parse(this.Key)['n'].toString(2).length //n的二进制长度
+          let MArr = group(this.M,maxBit)
+          MArr.forEach(item=>{
+            let temp = parseInt(item,2)
+            temp = Number(decode(temp, JSON.parse(this.Key)))
+            temp = temp.toString(2).padStart(16,'0')
+            this.C += toStr16(temp)
+          })
+        }else{
+          this.C = decode(this.M, JSON.parse(this.Key))
+        }
         let t2 = new Date()
         this.$message({message: '加密成功！用时' + (t2 - t1) + 'ms', type: 'success'});
         console.log('Time:', t2 - t1);
+        this.loading3=false
       },
     },
   }

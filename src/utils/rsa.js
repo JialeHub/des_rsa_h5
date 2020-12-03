@@ -1,6 +1,77 @@
 import store from "@/store";
 
 /**
+ * @param ss 字符串
+ * @param step 步长
+ * @return {Object} 32+32=64bit
+ * @description 字符串分组
+ * */
+export const group = (ss, step) => {
+  let r = [];
+
+  function doGroup(s) {
+    if (!s) return;
+    r.push(s.substr(0, step));
+    s = s.substr(step);
+    doGroup(s)
+  }
+
+  doGroup(ss);
+  return r;
+}
+
+/**
+ * @param str 字符串(16bit以内字符)
+ * @param bit16 是否转为16位(往前补0)，否则为默认
+ * @return {Object} 16bit
+ * @description 字符串转二进制
+ * */
+export const toBin16 = (str, bit16 = true) => {
+  str = str + ''
+  let result = [];
+  let list = str.split("");
+  list.forEach((item, index) => {
+    if (index !== 0) {
+      result.push(",");
+    }
+    let binStr = item.charCodeAt().toString(2);
+    result.push(binStr);
+  })
+  if (bit16) {
+    let res = result.join("").split(',').map(item => item.padStart(16,'0')).join("")
+    if (store.getters.con) console.log('字符转16位二进制：', str, '=>', res)
+    return res
+  } else {
+    if (store.getters.con) console.log('字符转二进制：', str, '=>', result.join(""))
+    return result.join("");
+  }
+}
+
+/**
+ * @param str 字符串
+ * @param bit16 是否转为16位(往前补0)，否则为默认
+ * @return {Object} 16bit
+ * @description 二进制转字符串
+ * */
+export const toStr16 = (str, bit16 = true) => {
+  if (bit16) str = group(str, 16).map(item => item.replace(/\b(0+)/gi,"")).join(",");
+  else str = str + '';
+  let result = [];
+  let list = str.split(",");
+  for (let i = 0; i < list.length; i++) {
+    let item = list[i];
+    let asciiCode = parseInt(item, 2);
+    let charValue = String.fromCharCode(asciiCode);
+    result.push(charValue);
+  }
+  if (store.getters.con) {
+    if (bit16) console.log('16位二进制转字符串：', str, '=>', result.join(""));
+    else console.log('二进制转字符串：', str, '=>', result.join(""));
+  }
+  return result.join("");
+}
+
+/**
  * @param n 被检测数
  * @param test_divisor 测试除数
  * @return Boolean
