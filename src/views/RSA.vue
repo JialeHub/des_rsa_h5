@@ -11,7 +11,7 @@
         </div>
         <div class="cryptogramBox">
           <div class="l">
-            <div class="lt1">🔒 要加密的明文/要解密的密文/生成密钥的区间：</div>
+            <div class="lt1">🔒 要加密的明文/要解密的密文/密钥素数的区间：</div>
             <el-input type="textarea" :rows="10" placeholder="请输入要加密的明文/要解密的密文" v-model="M"/>
             <div class="lt2">🔑 JSON格式密钥(加密公钥，解密私钥)：</div>
             <el-input type="text" placeholder="请输入密钥" v-model="Key"/>
@@ -51,8 +51,8 @@
         M: '2,99', //明文
         Key: '', //密钥
         C: '',
-        start: 2,//偶数寻找左端
-        end: 99//偶数寻找右端
+        start: 2,//素数寻找左端
+        end: 99//素数寻找右端
       }
     },
     mounted() {
