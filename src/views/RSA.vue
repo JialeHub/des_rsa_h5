@@ -55,7 +55,7 @@
         loading: false,
         loading2: false,
         loading3: false,
-        M: '2,99', //明文
+        M: '200,500', //明文
         Key: '', //密钥
         C: '',
         start: 2,//素数寻找左端
